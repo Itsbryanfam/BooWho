@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { analyzeSelfie, type AnalyzeResult } from "./actions/analyze";
+import { analyzeSelfie, type AnalyzeResult, type Gender } from "./actions/analyze";
 import { PhotoFrame } from "@/components/PhotoFrame";
 import { CandyButton } from "@/components/CandyButton";
 import { BooLoading, BooMark, type BooMood } from "@/components/Boo";
@@ -68,6 +68,7 @@ export default function HomePage() {
   const [hovering, setHovering] = useState(false);
   const [tagIdx, setTagIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [gender, setGender] = useState<Gender | null>(null);
 
   useEffect(() => {
     if (!busy) return;
@@ -91,6 +92,10 @@ export default function HomePage() {
   async function handleFile(file: File | undefined) {
     if (!file) return;
     setError(null);
+    if (!gender) {
+      setError("Pick female or male first so Boo knows who to look at.");
+      return;
+    }
     if (!file.type.startsWith("image/")) {
       setError("Hmm, that doesn't look like an image.");
       return;
@@ -101,7 +106,7 @@ export default function HomePage() {
       const base64 = await resizeToBase64Jpeg(file);
       setPreview(base64);
 
-      const result = await analyzeSelfie(base64);
+      const result = await analyzeSelfie(base64, gender);
       if (result.ok) {
         router.push(`/r/${result.shortId}`);
         return;
@@ -143,7 +148,7 @@ export default function HomePage() {
         <AnimatePresence mode="wait">
           {!busy && (
             <motion.div
-              key={mood}
+              key={`${mood}-${gender ?? "none"}`}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
@@ -151,17 +156,39 @@ export default function HomePage() {
               className="text-center mb-4"
             >
               <SpeechBubble>
-                {mood === "wow"
-                  ? "Ooh nice — let me look!"
-                  : mood === "excited"
-                    ? "Yes! Drop it!"
-                    : mood === "curious"
-                      ? "What've you got?"
-                      : "Got a selfie for me?"}
+                {!gender
+                  ? "First — witch or warlock?"
+                  : mood === "wow"
+                    ? "Ooh nice — let me look!"
+                    : mood === "excited"
+                      ? "Yes! Drop it!"
+                      : mood === "curious"
+                        ? "What've you got?"
+                        : "Got a selfie for me?"}
               </SpeechBubble>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Gender picker */}
+        <div className="flex justify-center gap-3 mb-5">
+          <GenderPill
+            label="Female"
+            emoji="🧙‍♀️"
+            color="pink"
+            selected={gender === "female"}
+            onClick={() => !busy && setGender("female")}
+            disabled={busy}
+          />
+          <GenderPill
+            label="Male"
+            emoji="🧛"
+            color="purple"
+            selected={gender === "male"}
+            onClick={() => !busy && setGender("male")}
+            disabled={busy}
+          />
+        </div>
 
         {/* Photo frame */}
         <motion.div
@@ -300,6 +327,53 @@ export default function HomePage() {
         </p>
       </div>
     </main>
+  );
+}
+
+function GenderPill({
+  label,
+  emoji,
+  color,
+  selected,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  emoji: string;
+  color: "pink" | "purple";
+  selected: boolean;
+  onClick: () => void;
+  disabled: boolean;
+}) {
+  const palette =
+    color === "pink"
+      ? { bg: "var(--candy-pink)", bgHi: "var(--candy-pink-bright)", shadow: "#cc7d92" }
+      : { bg: "var(--candy-purple)", bgHi: "var(--candy-purple-bright)", shadow: "#8a64cc" };
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      whileHover={!disabled ? { y: -2 } : undefined}
+      whileTap={!disabled ? { y: 4 } : undefined}
+      transition={{ type: "spring", stiffness: 600, damping: 25 }}
+      className={`relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-display font-semibold text-sm cursor-pointer select-none transition-opacity ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+      style={{
+        background: selected
+          ? `linear-gradient(180deg, ${palette.bgHi} 0%, ${palette.bg} 100%)`
+          : "var(--plum-soft)",
+        color: selected ? "var(--ink)" : "var(--cream)",
+        border: "3px solid var(--ink)",
+        boxShadow: selected
+          ? `0 4px 0 ${palette.shadow}, 0 6px 12px rgba(21, 9, 36, 0.4), inset 0 2px 0 rgba(255,255,255,0.4)`
+          : "0 4px 0 var(--ink)",
+      }}
+      aria-pressed={selected}
+    >
+      <span aria-hidden>{emoji}</span>
+      <span>{label}</span>
+    </motion.button>
   );
 }
 

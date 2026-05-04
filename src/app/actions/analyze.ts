@@ -19,13 +19,21 @@ const nanoid = customAlphabet(
 
 const MAX_BASE64_BYTES = 8 * 1024 * 1024;
 
+export type Gender = "female" | "male";
+
 export type AnalyzeResult =
   | { ok: true; shortId: string }
   | { ok: false; error: "no_face" | "too_large" | "rate_limited" | "blocked" | "unknown" };
 
-export async function analyzeSelfie(base64Jpeg: string): Promise<AnalyzeResult> {
+export async function analyzeSelfie(
+  base64Jpeg: string,
+  gender: Gender,
+): Promise<AnalyzeResult> {
   if (!base64Jpeg || base64Jpeg.length > MAX_BASE64_BYTES) {
     return { ok: false, error: "too_large" };
+  }
+  if (gender !== "female" && gender !== "male") {
+    return { ok: false, error: "unknown" };
   }
 
   const cleaned = base64Jpeg.replace(/^data:image\/[a-z]+;base64,/, "");
@@ -41,7 +49,7 @@ export async function analyzeSelfie(base64Jpeg: string): Promise<AnalyzeResult> 
           parts: [
             { inlineData: { mimeType: "image/jpeg", data: cleaned } },
             {
-              text: "Suggest 5 Halloween costumes per the system instructions, covering all four categories.",
+              text: `The person in this photo identifies as ${gender}. Suggest 5 Halloween costumes per the system instructions, covering all four categories. Pick subjects whose gender presentation matches.`,
             },
           ],
         },
