@@ -1,0 +1,25 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Deploys BooWho as a Node web service. Secrets (sync: false) are entered
+# once via the Render dashboard at create time, never stored in this repo.
+
+services:
+  - type: web
+    name: boowho
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NEXT_PUBLIC_INSTANT_APP_ID
+        sync: false
+      - key: INSTANT_APP_ADMIN_TOKEN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: WIKIPEDIA_USER_AGENT
+        value: "BooWho/0.1 (https://github.com/Itsbryanfam/BooWho)"

@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+:root {
+  --plum: #1f1235;
+  --plum-deep: #150924;
+  --plum-soft: #2e1a4a;
+  --cream: #fff4e0;
+  --cream-soft: #fff9eb;
+  --ink: #2a1b3d;
+  --candy-orange: #ff8a3c;
+  --candy-orange-bright: #ffa162;
+  --candy-purple: #c9a3ff;
+  --candy-purple-bright: #d9b9ff;
+  --candy-mint: #7fe0c7;
+  --candy-pink: #ffb3c8;
+  --candy-pink-bright: #ffc9d6;
+  --candy-yellow: #ffd86b;
+
+  /* Per-category accent — used by costume cards */
+  --cat-celebrity: #ffb3c8;
+  --cat-fiction:   #c9a3ff;
+  --cat-historical:#ffd86b;
+  --cat-archetype: #7fe0c7;
+}
+
+@theme inline {
+  --color-plum: var(--plum);
+  --color-plum-deep: var(--plum-deep);
+  --color-plum-soft: var(--plum-soft);
+  --color-cream: var(--cream);
+  --color-cream-soft: var(--cream-soft);
+  --color-ink: var(--ink);
+  --color-candy-orange: var(--candy-orange);
+  --color-candy-orange-bright: var(--candy-orange-bright);
+  --color-candy-purple: var(--candy-purple);
+  --color-candy-purple-bright: var(--candy-purple-bright);
+  --color-candy-mint: var(--candy-mint);
+  --color-candy-pink: var(--candy-pink);
+  --color-candy-pink-bright: var(--candy-pink-bright);
+  --color-candy-yellow: var(--candy-yellow);
+
+  --color-cat-celebrity: var(--cat-celebrity);
+  --color-cat-fiction: var(--cat-fiction);
+  --color-cat-historical: var(--cat-historical);
+  --color-cat-archetype: var(--cat-archetype);
+
+  --font-display: var(--font-display);
+  --font-script: var(--font-script);
+}
+
+html, body {
+  background: var(--plum);
+  color: var(--cream);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-feature-settings: "kern", "liga";
+}
+
+::selection {
+  background: var(--candy-orange);
+  color: var(--ink);
+}
+
+/* base body deep gradient */
+body {
+  background:
+    radial-gradient(ellipse 80% 60% at 30% 0%, rgba(201, 163, 255, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 80% 100%, rgba(255, 138, 60, 0.16) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(127, 224, 199, 0.06) 0%, transparent 70%),
+    var(--plum);
+  background-attachment: fixed;
+}
+
+@keyframes ground-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+body { animation: ground-fade 500ms ease-out both; }
+
+/* ───── ATMOSPHERE — floaty halloween decor ───── */
+
+.atmos-decor {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+@keyframes float-a {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-22px) rotate(8deg); }
+}
+@keyframes float-b {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-32px) rotate(-12deg); }
+}
+@keyframes float-c {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-16px) rotate(15deg); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.9); }
+  50%      { opacity: 0.9; transform: scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atmos-decor *, body { animation: none !important; }
+}
+
+/* sticker / chunky drop shadow */
+.sticker-shadow {
+  filter: drop-shadow(0 6px 0 rgba(21, 9, 36, 0.45));
+}
+.sticker-shadow-sm {
+  filter: drop-shadow(0 3px 0 rgba(21, 9, 36, 0.4));
+}
+
+/* paper texture for cards */
+.paper {
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 255, 255, 0.4) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 90%, rgba(0, 0, 0, 0.05) 0%, transparent 50%),
+    var(--cream);
+  color: var(--ink);
+}
+
+/* font helpers */
+.font-display { font-family: var(--font-display), system-ui, sans-serif; }
+.font-script  { font-family: var(--font-script), "Comic Sans MS", cursive; }
