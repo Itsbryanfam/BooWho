@@ -271,7 +271,6 @@ export default function HomePage() {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          capture="user"
           className="hidden"
           onChange={(e) => handleFile(e.target.files?.[0] ?? undefined)}
           disabled={busy}
